@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>Sonirvor Group</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+  :root{--brand:#0f766e;--brand2:#14b8a6;--bg:#f3f6f9;--ink:#0f172a;--mute:#64748b}
+  html,body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Bengali",sans-serif;-webkit-tap-highlight-color:transparent}
+  .shell{max-width:520px;margin:0 auto;min-height:100vh;position:relative}
+  .view{display:none}
+  .view.active{display:block;animation:slideIn .28s ease}
+  @keyframes slideIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .hero{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:calc(env(safe-area-inset-top) + 22px) 20px 56px;border-radius:0 0 28px 28px}
+  .pull{margin-top:-40px;padding:0 16px}
+  .cardx{background:#fff;border-radius:18px;box-shadow:0 4px 18px rgba(15,23,42,.06);padding:16px}
+  .stat small{color:var(--mute);display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+  .stat b{font-size:1.15rem}
+  .btn-brand{background:var(--brand);color:#fff;border:0;border-radius:14px;padding:13px;font-weight:600}
+  .btn-brand:hover,.btn-brand:focus{background:#0b5f58;color:#fff}
+  .btn-brand:disabled{background:#94a3b8;color:#fff}
+  .form-control,.form-select{border-radius:14px;padding:13px 14px;font-size:1rem}
+  .content{padding:16px 16px 150px}
+  .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:#fff;display:flex;border-top:1px solid #e5e9f0;padding-bottom:env(safe-area-inset-bottom)}
+  .bottom-nav button{flex:1;border:0;background:none;padding:10px 2px 8px;color:var(--mute);font-size:.66rem;position:relative}
+  .bottom-nav button i{display:block;font-size:1.25rem}
+  .bottom-nav button.on{color:var(--brand);font-weight:600}
+  .bdg{position:absolute;top:4px;left:55%;background:#ef4444;color:#fff;border-radius:10px;font-size:.62rem;padding:1px 6px}
+  .fab{position:fixed;bottom:calc(74px + env(safe-area-inset-bottom));right:max(16px,calc(50% - 244px));z-index:60;border:0;border-radius:30px;padding:14px 20px;background:var(--brand);color:#fff;font-weight:600;box-shadow:0 10px 20px rgba(20,184,166,.25)}
+  .tx{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #eef1f5;gap:10px}
+  .tx:last-child{border:0}
+  .pill{font-size:.68rem;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
+  .p-Approved,.p-Active{background:#dcfce7;color:#166534}
+  .p-Pending{background:#fef3c7;color:#92400e}
+  .p-Rejected,.p-Removed{background:#fee2e2;color:#991b1b}
+  .p-Admin{background:#dbeafe;color:#1e40af}
+  .p-Member{background:#e2e8f0;color:#334155}
+  .dash-card{height:100%;cursor:pointer;transition:transform .15s}
+  .dash-card:active{transform:scale(.97)}
+  .dash-card i{font-size:1.3rem;color:var(--brand)}
+  .dash-card small{display:block;color:var(--mute);font-size:.74rem;margin-top:2px}
+  .dash-card b{display:block;font-size:1.02rem;margin-top:2px}
+  .dash-card.static{cursor:default}
+  .dash-big{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#3b2a00;cursor:pointer}
+  .dash-big small{color:#5b4300;font-size:.8rem}
+  .chipm{display:inline-block;background:#eef2f6;border-radius:8px;font-size:.68rem;padding:1px 7px;margin:2px 3px 0 0;color:#334155}
+  .steps{display:flex;gap:6px;margin:14px 0 18px}
+  .steps span{flex:1;height:6px;border-radius:6px;background:#dbe3ea;transition:.3s}
+  .steps span.on{background:var(--brand)}
+  .step{display:none}.step.on{display:block;animation:slideIn .25s ease}
+  .opt{display:block;border:2px solid #e2e8f0;border-radius:16px;padding:16px;text-align:center;cursor:pointer;background:#fff;transition:.2s}
+  .opt input{display:none}
+  .opt i{font-size:1.8rem;display:block}
+  .opt.sel{border-color:var(--brand);background:#f0fdfa;color:var(--brand);font-weight:600}
+  .drop{border:2px dashed #94a3b8;border-radius:18px;padding:26px 12px;text-align:center;background:#fff;cursor:pointer}
+  .drop.has{border-color:var(--brand);border-style:solid}
+  .drop img{max-height:190px;max-width:100%;border-radius:12px}
+  #busy{position:fixed;inset:0;background:rgba(255,255,255,.65);display:none;align-items:center;justify-content:center;z-index:2000}
+  #busy.on{display:flex}
+  .tbl{font-size:.82rem}
+  .ok-anim{font-size:4.5rem;color:var(--brand);animation:pop .5s ease}
+  @keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+  .toast-wrap{position:fixed;top:calc(env(safe-area-inset-top) + 10px);left:50%;transform:translateX(-50%);z-index:3000;width:92%;max-width:480px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- LOGIN -->
+  <section id="loginView" class="view">
+    <div class="hero text-center" style="padding-bottom:70px">
+      <i class="bi bi-wallet2" style="font-size:3rem"></i>
+      <h4 class="mt-2 mb-0">Sonirvor Group</h4>
+      <small class="opacity-75">Sign in to continue</small>
+    </div>
+    <div class="pull">
+      <form id="loginForm" class="cardx" autocomplete="on">
+        <label class="form-label small text-muted">Email or User ID</label>
+        <input id="lName" class="form-control mb-3" type="text" autocomplete="username" autocapitalize="none" inputmode="email" placeholder="you@example.com / User ID" required>
+        <label class="form-label small text-muted">PIN / Password</label>
+        <input id="lPin" class="form-control mb-3" type="password" autocomplete="current-password" inputmode="numeric" placeholder="••••" required>
+        <div id="lErr" class="text-danger small mb-2" style="min-height:20px"></div>
+        <button class="btn btn-brand w-100" type="submit">Sign in</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section id="appView" class="view">
+    <div class="hero">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <small class="opacity-75" id="hRole"></small>
+          <h5 class="mb-0" id="hName"></h5>
+        </div>
+        <div>
+          <button class="btn btn-sm text-white" id="btnNotice" title="Notices"><i class="bi bi-bell fs-5"></i></button>
+          <button class="btn btn-sm text-white" id="btnRefresh" title="Refresh"><i class="bi bi-arrow-clockwise fs-5"></i></button>
+          <button class="btn btn-sm text-white" id="btnLogout" title="Sign out"><i class="bi bi-box-arrow-right fs-5"></i></button>
+        </div>
+      </div>
+      <div class="mt-3" id="heroBig"></div>
+    </div>
+    <div class="content pull" id="tabContent"></div>
+    <button class="fab" id="fab" style="display:none"><i class="bi bi-plus-lg"></i> New Deposit</button>
+    <nav class="bottom-nav" id="nav"></nav>
+  </section>
+
+  <!-- GROUP DETAIL (deposits / investment / expense) -->
+  <section id="detailView" class="view">
+    <div class="p-3" style="padding-top:calc(env(safe-area-inset-top) + 16px)!important;padding-bottom:60px!important">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <button class="btn btn-light rounded-circle" id="dBack"><i class="bi bi-arrow-left"></i></button>
+        <div><h5 class="mb-0" id="dTitle"></h5><small class="text-muted" id="dSub"></small></div>
+      </div>
+      <div id="dBody"></div>
+    </div>
+  </section>
+
+  <!-- ADMIN LEDGER -->
+  <section id="ledgerView" class="view">
+    <div class="p-3" style="padding-top:calc(env(safe-area-inset-top) + 16px)!important;padding-bottom:100px!important">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <button class="btn btn-light rounded-circle" id="lBack"><i class="bi bi-arrow-left"></i></button>
+        <div><h5 class="mb-0" id="lTitle"></h5><small class="text-muted" id="lSub"></small></div>
+      </div>
+      <div class="cardx" id="lBody"></div>
+    </div>
+  </section>
+
+  <!-- NOTICES -->
+  <section id="noticeView" class="view">
+    <div class="p-3" style="padding-top:calc(env(safe-area-inset-top) + 16px)!important;padding-bottom:60px!important">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <button class="btn btn-light rounded-circle" id="nBack"><i class="bi bi-arrow-left"></i></button>
+        <h5 class="mb-0">নোটিশ ও যোগাযোগ</h5>
+      </div>
+      <div class="cardx mb-3">
+        <div class="row g-2">
+          <div class="col-6"><a class="btn btn-outline-secondary w-100 py-2" id="callCashier" href="#"></a></div>
+          <div class="col-6"><a class="btn btn-outline-secondary w-100 py-2" id="callChairman" href="#"></a></div>
+        </div>
+      </div>
+      <div class="cardx mb-3" id="noticeComposer" style="display:none">
+        <h6>নতুন নোটিশ</h6>
+        <textarea id="nText" class="form-control mb-2" rows="3" placeholder="লিখুন..."></textarea>
+        <label class="btn btn-outline-secondary btn-sm mb-2">
+          <i class="bi bi-paperclip"></i> ফাইল/ছবি যুক্ত করুন (ঐচ্ছিক)
+          <input type="file" id="nFile" accept="image/*,application/pdf" hidden></label>
+        <div id="nFileName" class="small text-muted mb-2"></div>
+        <button class="btn btn-brand w-100" id="nPost">পোস্ট করুন</button>
+      </div>
+      <div id="noticeList"></div>
+    </div>
+  </section>
+
+  <!-- WIZARD -->
+  <section id="wizView" class="view">
+    <div class="p-3" style="padding-top:calc(env(safe-area-inset-top) + 16px)!important">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-light rounded-circle" id="wBack"><i class="bi bi-arrow-left"></i></button>
+        <h5 class="mb-0">New Deposit</h5>
+      </div>
+      <div class="steps" id="wSteps"><span></span><span></span><span></span></div>
+
+      <div id="wBody">
+        <div class="step" data-s="1">
+          <h6 class="mb-3">Step 1 · Month &amp; amount</h6>
+          <label class="form-label small text-muted">Month</label>
+          <select id="wMonth" class="form-select mb-1"></select>
+          <div id="wMonthHint" class="small text-warning-emphasis mb-3" style="min-height:18px"></div>
+          <label class="form-label small text-muted">Amount</label>
+          <input id="wAmount" class="form-control" type="number" inputmode="decimal" min="1" step="any" placeholder="0">
+        </div>
+
+        <div class="step" data-s="2">
+          <h6 class="mb-3">Step 2 · Payment details</h6>
+          <label class="form-label small text-muted">Payment medium</label>
+          <div class="row g-2 mb-3">
+            <div class="col-6"><label class="opt" data-m="Bank"><input type="radio" name="med" value="Bank"><i class="bi bi-bank"></i>Bank</label></div>
+            <div class="col-6"><label class="opt" data-m="Cash"><input type="radio" name="med" value="Cash"><i class="bi bi-cash-coin"></i>Cash</label></div>
+          </div>
+          <label class="form-label small text-muted">Payment date</label>
+          <input id="wDate" class="form-control" type="date">
+        </div>
+
+        <div class="step" data-s="3">
+          <h6 class="mb-1">Step 3 · Payment proof <span class="text-danger">*</span></h6>
+          <p class="small text-muted">Upload your receipt (image or PDF). Required to submit.</p>
+          <label class="drop d-block" id="wDrop">
+            <input id="wFile" type="file" accept="image/*,application/pdf" hidden>
+            <div id="wDropIn"><i class="bi bi-cloud-arrow-up fs-1 text-secondary"></i><div class="fw-semibold">Tap to choose a file</div><small class="text-muted">JPG · PNG · PDF</small></div>
+          </label>
+          <div id="wSummary" class="cardx mt-3 small"></div>
+        </div>
+
+        <div class="step" data-s="4">
+          <div class="text-center py-5">
+            <i class="bi bi-check-circle-fill ok-anim"></i>
+            <h5 class="mt-3">Submitted!</h5>
+            <p class="text-muted">Your deposit is now <b>Pending</b> until the treasurer verifies your proof.</p>
+            <button class="btn btn-brand w-100" id="wDone">Back to dashboard</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 mt-4" id="wNav">
+        <button class="btn btn-light flex-fill" id="wPrev" style="border-radius:14px;padding:13px">Back</button>
+        <button class="btn btn-brand flex-fill" id="wNext">Next</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Pick-your-name modal (shared default User ID) -->
+<div class="modal fade" id="pickModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius:18px">
+      <div class="modal-body">
+        <h6>আপনার নাম বাছাই করুন</h6>
+        <p class="small text-muted">Select your name to continue.</p>
+        <div id="pickList" class="d-grid gap-2"></div>
+        <button class="btn btn-light w-100 mt-3" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Proof modal -->
+<div class="modal fade" id="proofModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h6 class="modal-title">Payment proof</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body text-center" id="proofBody"></div>
+      <div class="modal-footer"><a id="proofLink" class="btn btn-outline-secondary btn-sm" target="_blank" rel="noopener">Open in Drive</a><button class="btn btn-brand btn-sm px-4" data-bs-dismiss="modal">Close</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Action modal (confirm / reject) -->
+<div class="modal fade" id="actModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:18px">
+      <div class="modal-body">
+        <h6 id="actTitle"></h6>
+        <p class="small text-muted" id="actText"></p>
+        <textarea id="actNote" class="form-control mb-3" rows="2" placeholder="Reason (optional)" style="display:none"></textarea>
+        <div class="d-flex gap-2">
+          <button class="btn btn-light flex-fill" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn flex-fill" id="actOk">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User add/edit modal -->
+<div class="modal fade" id="userModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:18px">
+      <div class="modal-body">
+        <h6 id="uTitle">Add user</h6>
+        <label class="form-label small text-muted mt-2">Full name</label>
+        <input id="uName" class="form-control mb-2">
+        <label class="form-label small text-muted">Email (used to sign in)</label>
+        <input id="uEmail" class="form-control mb-2" type="email" autocapitalize="none" inputmode="email">
+        <label class="form-label small text-muted">PIN</label>
+        <input id="uPin" class="form-control mb-1" type="text" inputmode="numeric" autocomplete="off">
+        <small class="text-muted d-block mb-2" id="uPinHint"></small>
+        <label class="form-label small text-muted">Role</label>
+        <select id="uRole" class="form-select mb-2"><option value="Member">Member</option><option value="Admin">Admin</option></select>
+        <label class="form-label small text-muted">Fund sheet name <span class="text-muted">(blank = same as name)</span></label>
+        <input id="uSheet" class="form-control mb-2">
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="uCreate">
+          <label class="form-check-label small" for="uCreate">Create the fund sheet if it doesn't exist</label>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-light flex-fill" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-brand flex-fill" id="uSave">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Entry edit modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:18px">
+      <div class="modal-body">
+        <h6>Edit entry</h6>
+        <p class="small text-muted" id="eInfo"></p>
+        <label class="form-label small text-muted">Month</label>
+        <select id="eMonth" class="form-select mb-2"></select>
+        <label class="form-label small text-muted">Amount</label>
+        <input id="eAmount" class="form-control mb-2" type="number" inputmode="decimal" step="any">
+        <label class="form-label small text-muted">Medium</label>
+        <select id="eMedium" class="form-select mb-2"></select>
+        <label class="form-label small text-muted">Date</label>
+        <input id="eDate" class="form-control" type="date">
+        <small class="text-muted d-block" id="eDateHint"></small>
+        <div class="small text-muted mt-2">Status changes use Approve / Reject. Every edit is saved in the “Audit Log” sheet.</div>
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn btn-light flex-fill" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-brand flex-fill" id="eSave">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="busy"><div class="spinner-border text-success"></div></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* =================== STATE & HELPERS =================== */
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const S = { token: null, data: null, tab: null, viewed: {}, wiz: { step: 1, file: null } };
+try { S.token = localStorage.getItem('fm_token'); } catch (e) {}
+const $ = id => document.getElementById(id);
+const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => (S.data ? S.data.currency : '') + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+const moneyD = n => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + (S.data ? S.data.currency : '৳');
+const modal = id => bootstrap.Modal.getOrCreateInstance($(id));
+
+/* =================== API CONNECTION FOR VERCEL =================== */
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzS4ybFMKL4FvVUVcesWHh7f5y4mnKRu86f4KcuCCXfLYd7H-5BgAWA6QifYwW4fUR2/exec";
+
+async function api(fn, ...args) {
+  const response = await fetch(GAS_API_URL, {
+    method: 'POST',
+    redirect: 'follow',
+    body: JSON.stringify({ action: fn, args: args })
+  });
+  const json = await response.json();
+  if (!json.success) {
+    throw new Error(json.error);
+  }
+  return json.result;
+}
+
+/* =================== AUTH =================== */
+async function doLogin(pickKey) {
+  $('lErr').textContent = '';
+  busy(true);
+  try {
+    const r = await api('login', $('lName').value, $('lPin').value, pickKey || '');
+    if (r.choose) { showPick(r.choose); return; }
+    if (!r.ok) { $('lErr').textContent = r.error; return; }
+    S.token = r.token;
+    try { localStorage.setItem('fm_token', r.token); } catch (e) {}
+    $('lPin').value = '';
+    await load();
+  } catch (e) { handleErr(e); } finally { busy(false); }
+}
+$('loginForm').addEventListener('submit', ev => { ev.preventDefault(); doLogin(''); });
+function showPick(list) {
+  $('pickList').innerHTML = list.map(p => `<button class="btn btn-outline-secondary text-start" data-key="${esc(p.key)}">${esc(p.name)}</button>`).join('');
+  modal('pickModal').show();
+}
+$('pickList').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  modal('pickModal').hide();
+  doLogin(b.dataset.key);
+});
+function doLogout(silent) {
+  if (S.token) api('logout', S.token).catch(() => {});
+  S.token = null; S.data = null; S.viewed = {};
+  try { localStorage.removeItem('fm_token'); } catch (e) {}
+  view('loginView');
+  if (silent) toast('Session expired. Please sign in again.', 'warning');
+}
+$('btnLogout').onclick = () => doLogout(false);
+$('btnRefresh').onclick = async () => { busy(true); try { await load(true); } catch (e) { handleErr(e); } finally { busy(false); } };
+
+/* =================== LOAD & RENDER =================== */
+async function load(keepTab, stay) {
+  S.data = await api('getBootstrap', S.token);
+  const d = S.data;
+  const isAdmin = d.user.role === 'Admin';
+  const dash = { k: 'dash', i: 'speedometer2', t: 'Dashboard' };
+  const fund = { k: 'fund', i: 'wallet2', t: 'My Fund' };
+  const items = isAdmin
+    ? [dash,
+       { k: 'approvals', i: 'patch-check', t: 'Approvals', badge: d.admin.pending.length },
+       { k: 'members', i: 'people', t: 'Members' }, fund,
+       { k: 'account', i: 'person-gear', t: 'Account' }]
+    : [dash, fund, { k: 'account', i: 'person-gear', t: 'Account' }];
+  S.items = items;
+  if (!keepTab || !items.some(x => x.k === S.tab)) S.tab = items[0].k;
+  $('hName').textContent = d.user.name;
+  $('hRole').textContent = (d.appName || 'Sonirvor Group') + ' · ' + (isAdmin ? 'Treasurer / Admin' : 'Member');
+  $('fab').style.display = d.own ? 'block' : 'none';
+  if (!stay) view('appView');
+  render();
+}
+function render() {
+  const d = S.data;
+  $('nav').innerHTML = S.items.map(x =>
+    `<button class="${x.k === S.tab ? 'on' : ''}" data-k="${x.k}"><i class="bi bi-${x.i}"></i>${x.t}${x.badge ? `<span class="bdg">${x.badge}</span>` : ''}</button>`).join('');
+  let big = '';
+  if (d.own) {
+    big = `<small class="opacity-75">আমার জমা</small><div class="fs-2 fw-bold">${money(d.own.approved)}</div>`
+        + (d.own.pending ? `<small class="opacity-75 d-block">অপেক্ষমাণ ${money(d.own.pending)}</small>` : '')
+        + `<button class="btn btn-sm btn-light mt-2 js-deposit"><i class="bi bi-plus-lg"></i> টাকা জমা দিন</button>`;
+  } else {
+    big = `<small class="opacity-75">মোট সংগৃহীত ফান্ড</small><div class="fs-2 fw-bold">${moneyD(d.group.collected)}</div>`;
+  }
+  $('heroBig').innerHTML = big;
+  const v = { dash: vDash, fund: vFund, approvals: vApprovals, members: vMembers, account: vAccount }[S.tab];
+  const c = $('tabContent');
+  c.innerHTML = v(d);
+  c.style.animation = 'none'; void c.offsetWidth; c.style.animation = 'slideIn .25s ease';
+}
+$('nav').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  S.tab = b.dataset.k; render(); window.scrollTo(0, 0);
+});
+
+const pill = s => `<span class="pill p-${esc(s)}">${esc(s)}</span>`;
+const proofBtn = e => (e.proofUrl && !e.legacy) ? `<a href="#" class="small js-own-proof" data-id="${esc(e.id)}">View</a>` : '<span class="text-muted small">—</span>';
+
+/* ---- Main dashboard (same numbers as the "Dashboard" sheet) ---- */
+function vDash(d) {
+  const g = d.group, isAdmin = d.user.role === 'Admin';
+  const tile = (go, label, val, icon) => `<div class="col-6"><div class="cardx dash-card ${go ? '' : 'static'}" ${go ? `data-go="${go}" role="button"` : ''}>
+      <i class="bi bi-${icon}"></i><small>${label}</small><b>${moneyD(val)}</b></div></div>`;
+  let h = '';
+  if (d.usingDefaultPin) h += `<div class="alert alert-warning py-2 small mb-3">আপনি ডিফল্ট PIN ব্যবহার করছেন। <a href="#" class="alert-link js-tab" data-tab="account">এখানে পরিবর্তন করুন</a></div>`;
+  h += `<div class="cardx dash-big mb-2" data-go="deposits" role="button">
+      <small>মোট সংগৃহীত ফান্ড</small><div class="fs-3 fw-bold">${moneyD(g.collected)}</div>
+      ${g.pending ? `<small>অপেক্ষমাণ যাচাই: ${moneyD(g.pending)}</small>` : ''}</div>`;
+  h += `<div class="row g-2 mb-3">
+      ${tile('out', 'বিনিয়োগ ও অন্যান্য ব্যয়', g.outflow, 'arrow-up-right-circle')}
+      ${tile('', 'বর্তমান ব্যালেন্স', g.balance, 'piggy-bank')}
+      ${tile('invest', 'মোট বিনিয়োগ', g.investment, 'graph-up-arrow')}
+      ${tile('expense', 'মোট অন্যান্য ব্যয়', g.otherExpense, 'receipt')}</div>`;
+  h += `<div class="cardx mb-3"><div class="small text-muted mb-2">বিস্তারিত দেখুন</div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary flex-fill" data-go="deposits"><i class="bi bi-cash-stack"></i> মোট জমা</button>
+        <button class="btn btn-outline-secondary flex-fill" data-go="invest"><i class="bi bi-graph-up-arrow"></i> বিনিয়োগ</button>
+        <button class="btn btn-outline-secondary flex-fill" data-go="expense"><i class="bi bi-receipt"></i> খরচ</button>
+      </div></div>`;
+  if (isAdmin) {
+    const rows = d.admin.members.map(m => `<tr><td>${esc(m.name)}${m.status === 'Removed' ? ' <span class="pill p-Removed">removed</span>' : ''}</td><td>${money(m.approved)}</td><td>${m.pending ? money(m.pending) : '—'}</td><td>${m.count}</td></tr>`).join('');
+    h += `<div class="cardx"><h6>Member summary</h6><div class="table-responsive"><table class="table tbl align-middle">
+      <thead><tr><th>Member</th><th>Approved</th><th>Pending</th><th>Entries</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  }
+  return h;
+}
+
+/* ---- Group detail pages ---- */
+const ledgerCard = r => `<div class="tx"><div><div class="fw-semibold">${esc(r.item || '—')}</div>
+    <small class="text-muted">${esc(r.date)}${r.source ? ' · ' + esc(r.source) : ''}</small></div>
+    <div class="text-end"><div class="fw-semibold">${moneyD(r.total)}</div>${r.type ? `<span class="pill ${r.type === 'বিনিয়োগ' ? 'p-Admin' : 'p-Pending'}">${esc(r.type)}</span>` : ''}</div></div>`;
+const emptyBox = t => `<div class="text-center text-muted py-4">${t}</div>`;
+
+function openDetail(kind) {
+  const g = S.data.group;
+  let title = '', sub = '', body = '';
+  if (kind === 'deposits') {
+    title = 'মোট জমা'; sub = moneyD(g.collected);
+    body = `<div class="cardx">${g.members.map(m => `<div class="tx"><div>
+        <div class="fw-semibold">${esc(m.name)}${m.status === 'Removed' ? ' <span class="pill p-Removed">removed</span>' : ''}</div>
+        <div>${m.months.length ? m.months.map(x => `<span class="chipm">${esc(x.slice(0, 3))}</span>`).join('') : '<small class="text-muted">এখনো জমা নেই</small>'}</div></div>
+        <div class="text-end fw-semibold">${m.approved ? money(m.approved) : '—'}</div></div>`).join('')}
+        <div class="tx"><div class="fw-bold">মোট</div><div class="fw-bold">${money(g.collected)}</div></div></div>`;
+  } else if (kind === 'invest') {
+    title = 'বিনিয়োগ'; sub = moneyD(g.investment);
+    const rows = g.ledger.filter(r => r.type === 'বিনিয়োগ');
+    body = `<div class="cardx mb-3">${rows.length ? rows.map(ledgerCard).join('') : emptyBox('এখনো কোনো বিনিয়োগ নেই।')}</div>`;
+    if (g.register.length) body += `<h6 class="mt-3 mb-2">বিনিয়োগের বিবরণ</h6>` + g.register.map(r => `<div class="cardx mb-2">
+        <div class="d-flex justify-content-between"><div class="fw-bold">${esc(r.purpose || '—')}</div><div class="fw-bold">${moneyD(r.amount)}</div></div>
+        <small class="text-muted d-block">${esc(r.date)}${r.meeting ? ' · মিটিং ' + esc(r.meeting) : ''}</small>
+        ${r.approvers ? `<div class="small mt-2"><span class="text-muted">অনুমোদনকারী:</span> ${esc(r.approvers)}</div>` : ''}
+        ${r.details ? `<div class="small mt-1">${esc(r.details)}</div>` : ''}</div>`).join('');
+  } else if (kind === 'expense') {
+    title = 'অন্যান্য ব্যয়'; sub = moneyD(g.otherExpense);
+    const rows = g.ledger.filter(r => r.type === 'অন্যান্য ব্যয়');
+    body = `<div class="cardx">${rows.length ? rows.map(ledgerCard).join('') : emptyBox('এখনো কোনো অন্যান্য ব্যয় নেই।')}</div>`;
+  } else {
+    title = 'বিনিয়োগ ও অন্যান্য ব্যয়'; sub = moneyD(g.outflow);
+    body = `<div class="cardx">${g.ledger.length ? g.ledger.map(ledgerCard).join('') : emptyBox('কোনো এন্ট্রি নেই।')}</div>`;
+  }
+  $('dTitle').textContent = title; $('dSub').textContent = sub; $('dBody').innerHTML = body;
+  view('detailView');
+}
+$('dBack').onclick = () => view('appView');
+
+/* ---- Member views: My Fund (deposit + full history + policy) ---- */
+function vFund(d) {
+  const o = d.own;
+  if (!o) return `<div class="cardx text-center text-muted">No fund sheet found for your account. Contact the admin.</div>`;
+  const isAdmin = d.user.role === 'Admin';
+  const bank = d.bank, policy = d.policy;
+  const rows = o.entries.map(e => `<tr><td>${esc(e.date)}</td><td>${esc(e.month)}</td><td class="fw-semibold">${money(e.amount)}</td><td>${esc(e.medium)}</td><td>${pill(e.status)}</td><td>${proofBtn(e)}</td></tr>`).join('');
+  return `<div class="row g-2 mb-3">
+      <div class="col-4"><div class="cardx stat"><small>Deposited</small><b>${money(o.approved)}</b></div></div>
+      <div class="col-4"><div class="cardx stat"><small>Pending</small><b>${money(o.pending)}</b></div></div>
+      <div class="col-4"><div class="cardx stat"><small>Entries</small><b>${o.count}</b></div></div></div>
+    <div class="cardx mb-3">
+      <div class="d-flex justify-content-between align-items-start gap-2">
+        <div><h6 class="mb-1">টাকা জমা দিন</h6><small class="text-muted">নিচের হিসাবে পাঠিয়ে "নতুন জমা" থেকে প্রমাণ আপলোড করুন</small></div>
+        <button class="btn btn-brand btn-sm text-nowrap js-deposit">+ নতুন জমা</button>
+      </div>
+      <div class="mt-3 small">
+        <div class="d-flex justify-content-between py-1"><span class="text-muted">ব্যাংক</span><span class="fw-semibold text-end">${esc(bank.name)}</span></div>
+        <div class="d-flex justify-content-between py-1"><span class="text-muted">শাখা</span><span class="fw-semibold text-end">${esc(bank.branch)}</span></div>
+        <div class="d-flex justify-content-between py-1"><span class="text-muted">হিসাবের নাম</span><span class="fw-semibold text-end">${esc(bank.accountName)}</span></div>
+        <div class="d-flex justify-content-between py-1 align-items-center"><span class="text-muted">হিসাব নম্বর</span>
+          <span class="fw-semibold text-end">${esc(bank.accountNo)} <a href="#" class="js-copy ms-1" data-copy="${esc(bank.accountNo)}" title="কপি করুন"><i class="bi bi-copy"></i></a></span></div>
+      </div>
+    </div>
+    <div class="cardx mb-3"><h6>All transactions</h6><div class="table-responsive"><table class="table tbl align-middle">
+      <thead><tr><th>Date</th><th>Month</th><th>Amount</th><th>Medium</th><th>Status</th><th>Proof</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6" class="text-center text-muted py-4">Nothing yet</td></tr>'}</tbody></table></div></div>
+    <div class="cardx">
+      <h6>যৌথ বিনিয়োগ নীতিমালা</h6>
+      ${policy
+        ? `<a href="${esc(policy.view)}" target="_blank" rel="noopener"><img src="${esc(policy.thumb)}" class="img-fluid rounded mt-2" alt="নীতিমালা"></a>`
+        : `<div class="text-muted small py-3 text-center">নীতিমালার ছবি শীঘ্রই যুক্ত হবে।</div>`}
+      ${isAdmin ? `<div class="mt-3">
+          <label class="btn btn-outline-secondary btn-sm w-100 mb-0">
+            <i class="bi bi-upload"></i> ${policy ? 'ছবি পরিবর্তন করুন' : 'ছবি আপলোড করুন'}
+            <input type="file" id="policyFile" accept="image/*" hidden></label></div>` : ''}
+    </div>`;
+}
+
+/* ---- Admin views ---- */
+function vApprovals(d) {
+  const p = d.admin.pending;
+  if (!p.length) return `<div class="cardx text-center py-5"><i class="bi bi-inbox fs-1 text-muted"></i><div class="text-muted mt-2">No entries waiting for approval.</div></div>`;
+  return p.map(e => {
+    const ok = !!S.viewed[e.id];
+    return `<div class="cardx mb-3" data-card="${esc(e.id)}">
+      <div class="d-flex justify-content-between"><div><div class="fw-bold">${esc(e.member)}</div><small class="text-muted">${esc(e.month)} · ${esc(e.medium)} · ${esc(e.date)}</small></div>
+        <div class="fs-5 fw-bold">${money(e.amount)}</div></div>
+      <small class="text-muted d-block mt-1">Submitted ${esc(e.submittedAt)}</small>
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-outline-secondary flex-fill js-view" data-sheet="${esc(e.sheetName)}" data-id="${esc(e.id)}"><i class="bi bi-eye"></i> View Proof</button>
+        <button class="btn btn-success flex-fill js-approve" data-sheet="${esc(e.sheetName)}" data-id="${esc(e.id)}" data-approve="${esc(e.id)}" ${ok ? '' : 'disabled'}><i class="bi bi-check2"></i> Approve</button>
+        <button class="btn btn-outline-danger js-reject" data-sheet="${esc(e.sheetName)}" data-id="${esc(e.id)}"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <small class="text-muted d-block mt-2">${ok ? 'Proof verified — you can approve.' : 'View the proof to enable approval.'}</small></div>`;
+  }).join('');
+}
+function vMembers(d) {
+  const me = d.user.email ? d.user.email.toLowerCase() : d.user.name.toLowerCase();
+  const cards = d.admin.members.map(m => {
+    const self = m.key === me;
+    return `<div class="cardx mb-2">
+      <div class="d-flex justify-content-between align-items-start">
+        <div><div class="fw-bold">${esc(m.name)}${self ? ' <small class="text-muted">(you)</small>' : ''}</div><small class="text-muted">${esc(m.email || 'no email yet')}</small></div>
+        <div class="text-end">${pill(m.role)} ${pill(m.status)}${m.defaultLogin ? ' <span class="pill p-Pending">Default login</span>' : ''}</div>
+      </div>
+      <div class="small mt-2 text-muted">Approved <b class="text-dark">${money(m.approved)}</b> · Pending <b class="text-dark">${money(m.pending)}</b> · ${m.count} entries${m.hasSheet ? '' : ' · <span class="text-danger">no sheet</span>'}</div>
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-sm btn-outline-secondary flex-fill js-ledger" data-sheet="${esc(m.sheet)}" ${m.hasSheet ? '' : 'disabled'}><i class="bi bi-journal-text"></i> Ledger</button>
+        <button class="btn btn-sm btn-outline-secondary flex-fill js-uedit" data-key="${esc(m.key)}"><i class="bi bi-pencil"></i> Edit</button>
+        ${m.status === 'Active'
+          ? `<button class="btn btn-sm btn-outline-danger js-ustatus" data-key="${esc(m.key)}" data-status="Removed" ${self ? 'disabled' : ''}><i class="bi bi-person-dash"></i></button>`
+          : `<button class="btn btn-sm btn-outline-success js-ustatus" data-key="${esc(m.key)}" data-status="Active"><i class="bi bi-person-check"></i> Restore</button>`}
+      </div></div>`;
+  }).join('');
+  return `<button class="btn btn-brand w-100 mb-3 js-uadd"><i class="bi bi-person-plus"></i> Add member / admin</button>${cards}`;
+}
+function vAccount(d) {
+  const u = d.user;
+  return `<div class="cardx mb-3"><div class="fw-bold">${esc(u.name)}</div><small class="text-muted d-block mb-1">${esc(u.email || 'No email yet — ask the admin')}</small>${pill(u.role)}</div>
+    <div class="cardx"><h6>Change PIN</h6>
+      <input id="pOld" type="password" inputmode="numeric" class="form-control mb-2" placeholder="Current PIN" autocomplete="current-password">
+      <input id="pNew" type="password" inputmode="numeric" class="form-control mb-2" placeholder="New PIN (4–8 digits)" autocomplete="new-password">
+      <input id="pNew2" type="password" inputmode="numeric" class="form-control mb-3" placeholder="Repeat new PIN" autocomplete="new-password">
+      <button class="btn btn-brand w-100 js-chgpin">Update PIN</button></div>`;
+}
+
+/* =================== PROOF + ACTIONS =================== */
+let blobUrl = null;
+async function showProof(sheet, id, isAdmin) {
+  $('proofBody').innerHTML = '<div class="spinner-border text-success my-5"></div>';
+  $('proofLink').style.display = 'none';
+  modal('proofModal').show();
+  try {
+    const p = await api('getProof', S.token, sheet, id);
+    if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
+    if (p.base64 && p.mime.indexOf('image/') === 0) {
+      $('proofBody').innerHTML = `<img class="img-fluid rounded" src="data:${esc(p.mime)};base64,${p.base64}">`;
+    } else if (p.base64 && p.mime === 'application/pdf') {
+      const bin = atob(p.base64), arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      blobUrl = URL.createObjectURL(new Blob([arr], { type: 'application/pdf' }));
+      $('proofBody').innerHTML = `<iframe src="${blobUrl}" style="width:100%;height:70vh;border:0"></iframe>`;
+    } else {
+      $('proofBody').innerHTML = '<p class="text-muted my-4">Preview not available. Use “Open in Drive”.</p>';
+    }
+    $('proofLink').href = p.url; $('proofLink').style.display = '';
+    if (isAdmin) {
+      S.viewed[id] = true;
+      const b = document.querySelector(`[data-approve="${CSS.escape(id)}"]`);
+      if (b) { b.disabled = false; const t = b.closest('[data-card]').querySelector('small:last-child'); if (t) t.textContent = 'Proof verified — you can approve.'; }
+    }
+  } catch (e) { modal('proofModal').hide(); handleErr(e); }
+}
+
+function ask({ title, text, note, btn, cls, onOk }) {
+  $('actTitle').textContent = title; $('actText').textContent = text;
+  $('actNote').style.display = note ? '' : 'none'; $('actNote').value = '';
+  $('actOk').textContent = btn; $('actOk').className = 'btn flex-fill ' + cls;
+  $('actOk').onclick = async () => { modal('actModal').hide(); busy(true); try { await onOk($('actNote').value); } catch (e) { handleErr(e); } finally { busy(false); } };
+  modal('actModal').show();
+}
+const ownSheet = () => S.data.user.sheet;
+const findMember = key => S.data.admin.members.find(m => m.key === key);
+
+$('tabContent').addEventListener('click', async e => {
+  const tabLink = e.target.closest('.js-tab');
+  if (tabLink) { e.preventDefault(); S.tab = tabLink.dataset.tab; render(); window.scrollTo(0, 0); return; }
+  const goEl = e.target.closest('[data-go]');
+  if (goEl) return openDetail(goEl.dataset.go);
+  const own = e.target.closest('.js-own-proof');
+  if (own) { e.preventDefault(); showProof(ownSheet(), own.dataset.id, false); return; }
+  const b = e.target.closest('button'); if (!b) return;
+  const { sheet, id, key } = b.dataset;
+  const cl = b.classList;
+
+  if (cl.contains('js-view')) return showProof(sheet, id, true);
+  if (cl.contains('js-approve') && !b.disabled) return ask({
+    title: 'Approve this entry?', text: 'Confirm that the payment proof matches the amount and date.', btn: 'Approve', cls: 'btn-success',
+    onOk: async () => { await api('approveEntry', S.token, sheet, id); toast('Entry approved'); await load(true); }
+  });
+  if (cl.contains('js-reject')) return ask({
+    title: 'Reject this entry?', text: 'The member will see it as Rejected.', note: true, btn: 'Reject', cls: 'btn-danger',
+    onOk: async note => { await api('rejectEntry', S.token, sheet, id, note); toast('Entry rejected', 'warning'); await load(true); }
+  });
+
+  if (cl.contains('js-uadd')) return openUser(null);
+  if (cl.contains('js-uedit')) return openUser(findMember(key));
+  if (cl.contains('js-ledger')) return openLedger(sheet);
+  if (cl.contains('js-ustatus')) {
+    const m = findMember(key), status = b.dataset.status;
+    return ask({
+      title: status === 'Removed' ? 'Remove ' + m.name + '?' : 'Restore ' + m.name + '?',
+      text: status === 'Removed' ? 'They will no longer be able to sign in. Their sheet and past records are kept.' : 'They will be able to sign in again.',
+      btn: status === 'Removed' ? 'Remove' : 'Restore', cls: status === 'Removed' ? 'btn-danger' : 'btn-success',
+      onOk: async () => { await api('setUserStatus', S.token, key, status); toast(status === 'Removed' ? 'User removed' : 'User restored'); await load(true, true); }
+    });
+  }
+  if (cl.contains('js-chgpin')) {
+    const o = $('pOld').value, n = $('pNew').value, n2 = $('pNew2').value;
+    if (!/^\d{4,8}$/.test(n)) return toast('New PIN must be 4–8 digits.', 'warning');
+    if (n !== n2) return toast('The new PINs do not match.', 'warning');
+    busy(true);
+    try { await api('changePin', S.token, o, n); toast('PIN updated'); ['pOld', 'pNew', 'pNew2'].forEach(i => $(i).value = ''); await load(true, true); }
+    catch (err) { handleErr(err); } finally { busy(false); }
+  }
+});
+
+/* =================== ADMIN: USER MODAL =================== */
+let uEditKey = null;
+function openUser(m) {
+  uEditKey = m ? m.key : null;
+  $('uTitle').textContent = m ? 'Edit user' : 'Add member / admin';
+  $('uName').value = m ? m.name : '';
+  $('uEmail').value = m ? m.email : '';
+  $('uPin').value = '';
+  $('uPin').placeholder = m ? 'Leave blank to keep current PIN' : 'PIN (4–8 digits)';
+  $('uPinHint').textContent = m && m.defaultLogin ? 'এই সদস্য ডিফল্ট লগইনে আছেন। নতুন PIN সেট করলে ডিফল্ট User ID বদলে যাবে।' : 'দুই-তিন ডিজিটের PIN নয়; 4–8 ডিজিট দিন।';
+  $('uRole').value = m ? m.role : 'Member';
+  $('uSheet').value = m && m.sheet !== m.name ? m.sheet : '';
+  $('uCreate').checked = !m;
+  modal('userModal').show();
+}
+$('uRole').onchange = () => { if (!uEditKey) $('uCreate').checked = $('uRole').value === 'Member'; };
+$('uSave').onclick = async () => {
+  const p = {
+    key: uEditKey, name: $('uName').value, email: $('uEmail').value, pin: $('uPin').value,
+    role: $('uRole').value, sheet: $('uSheet').value, createSheet: $('uCreate').checked
+  };
+  busy(true);
+  try {
+    await api('saveUser', S.token, p);
+    modal('userModal').hide();
+    toast(uEditKey ? 'User updated' : 'User added');
+    await load(true, true);
+  } catch (e) { handleErr(e); } finally { busy(false); }
+};
+
+/* =================== ADMIN: LEDGER & ENTRY EDIT =================== */
+let L = { sheet: '', member: '', entries: [] };
+let editing = null;
+async function fetchLedger(sheet) {
+  const r = await api('getLedger', S.token, sheet);
+  L = { sheet: r.sheet, member: r.member, entries: r.entries };
+  renderLedger();
+}
+async function openLedger(sheet) {
+  busy(true);
+  try { await fetchLedger(sheet); view('ledgerView'); } catch (e) { handleErr(e); } finally { busy(false); }
+}
+function renderLedger() {
+  $('lTitle').textContent = L.member;
+  $('lSub').textContent = L.entries.length + ' entries · tap ✎ to edit';
+  const rows = L.entries.map(e => `<tr>
+      <td>${esc(e.month)}</td><td class="fw-semibold">${money(e.amount)}</td><td>${esc(e.medium)}</td><td>${esc(e.date)}</td><td>${pill(e.status)}</td>
+      <td class="text-nowrap">${e.proofUrl && !e.legacy ? `<a href="#" class="me-2 js-lproof" data-id="${esc(e.id)}"><i class="bi bi-paperclip"></i></a>` : ''}
+        <button class="btn btn-sm btn-outline-secondary js-eedit" data-id="${esc(e.id)}"><i class="bi bi-pencil"></i></button></td></tr>`).join('');
+  $('lBody').innerHTML = `<div class="table-responsive"><table class="table tbl align-middle mb-0">
+    <thead><tr><th>Month</th><th>Amount</th><th>Medium</th><th>Date</th><th>Status</th><th></th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="6" class="text-center text-muted py-4">No entries</td></tr>'}</tbody></table></div>`;
+}
+$('lBack').onclick = () => view('appView');
+$('lBody').addEventListener('click', e => {
+  const a = e.target.closest('.js-lproof');
+  if (a) { e.preventDefault(); return showProof(L.sheet, a.dataset.id, false); }
+  const b = e.target.closest('.js-eedit');
+  if (b) openEdit(b.dataset.id);
+});
+function openEdit(id) {
+  const e = L.entries.find(x => x.id === id); if (!e) return;
+  editing = e;
+  $('eInfo').textContent = L.member + ' · ' + e.status + (e.legacy ? ' · old record' : '');
+  const mo = $('eMonth'); mo.innerHTML = '';
+  const ms = MONTHS.slice(); if (e.month && ms.indexOf(e.month) < 0) ms.unshift(e.month);
+  ms.forEach(m => mo.add(new Option(m, m)));
+  mo.value = e.month;
+  $('eAmount').value = e.amount;
+  const sel = $('eMedium'); sel.innerHTML = '';
+  const opts = ['Bank', 'Cash'];
+  if (opts.indexOf(e.medium) < 0) opts.unshift(e.medium);
+  opts.forEach(m => sel.add(new Option(m || '—', m)));
+  sel.value = e.medium;
+  $('eDate').value = e.dateISO || '';
+  $('eDateHint').textContent = e.dateISO ? '' : 'Current: ' + e.date + ' (leave blank to keep)';
+  modal('editModal').show();
+}
+$('eSave').onclick = async () => {
+  if (!editing) return;
+  busy(true);
+  try {
+    const r = await api('editEntry', S.token, L.sheet, editing.id,
+      { month: editing.month, amount: editing.amount, date: editing.date },
+      { month: $('eMonth').value, amount: Number($('eAmount').value), medium: $('eMedium').value, date: $('eDate').value });
+    modal('editModal').hide();
+    toast(r.changed ? 'Entry updated' : 'No changes', r.changed ? 'success' : 'info');
+    await fetchLedger(L.sheet);
+    await load(true, true);
+  } catch (e) { handleErr(e); } finally { busy(false); }
+};
+
+/* =================== WIZARD =================== */
+const W = S.wiz;
+function monthHint() {
+  const m = $('wMonth').value;
+  const hit = (S.data.own ? S.data.own.entries : []).filter(e => e.month === m && e.status !== 'Rejected');
+  $('wMonthHint').textContent = hit.length
+    ? '⚠ ' + m + ' মাসের জমা আগেই আছে (' + hit.map(x => x.status).join(', ') + '). ভিন্ন পেমেন্ট হলে চালিয়ে যান।'
+    : '';
+}
+function openWizard() {
+  W.step = 1; W.file = null;
+  const mSel = $('wMonth'); mSel.innerHTML = '';
+  const cur = new Date().getMonth();
+  MONTHS.forEach((m, i) => { const o = new Option(m, m); if (i === cur) o.selected = true; mSel.add(o); });
+  monthHint();
+  $('wAmount').value = '';
+  document.querySelectorAll('.opt').forEach(o => { o.classList.remove('sel'); o.querySelector('input').checked = false; });
+  const t = new Date(); $('wDate').value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+  $('wFile').value = ''; resetDrop(); $('wNav').style.display = '';
+  go(1); view('wizView');
+}
+$('wMonth').addEventListener('change', monthHint);
+function go(n) {
+  W.step = n;
+  document.querySelectorAll('.step').forEach(s => s.classList.toggle('on', Number(s.dataset.s) === n));
+  document.querySelectorAll('#wSteps span').forEach((s, i) => s.classList.toggle('on', i < Math.min(n, 3)));
+  $('wPrev').style.visibility = n === 1 ? 'hidden' : 'visible';
+  $('wNext').textContent = n === 3 ? 'Submit deposit' : 'Next';
+  $('wNext').disabled = n === 3 && !W.file;
+  if (n === 3) summary();
+}
+function summary() {
+  $('wSummary').innerHTML = `<div class="d-flex justify-content-between"><span class="text-muted">Month</span><b>${esc($('wMonth').value)}</b></div>
+    <div class="d-flex justify-content-between"><span class="text-muted">Amount</span><b>${money($('wAmount').value)}</b></div>
+    <div class="d-flex justify-content-between"><span class="text-muted">Medium</span><b>${esc(medium())}</b></div>
+    <div class="d-flex justify-content-between"><span class="text-muted">Date</span><b>${esc($('wDate').value)}</b></div>`;
+}
+const medium = () => { const r = document.querySelector('input[name=med]:checked'); return r ? r.value : ''; };
+document.querySelectorAll('.opt').forEach(o => o.addEventListener('click', () => {
+  document.querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
+  o.classList.add('sel'); o.querySelector('input').checked = true;
+}));
+function resetDrop() {
+  $('wDrop').classList.remove('has');
+  $('wDropIn').innerHTML = '<i class="bi bi-cloud-arrow-up fs-1 text-secondary"></i><div class="fw-semibold">Tap to choose a file</div><small class="text-muted">JPG · PNG · PDF</small>';
+}
+$('wFile').addEventListener('change', async ev => {
+  const f = ev.target.files[0]; W.file = null; resetDrop(); $('wNext').disabled = true;
+  if (!f) return;
+  busy(true);
+  try {
+    W.file = await prepFile(f);
+    $('wDrop').classList.add('has');
+    $('wDropIn').innerHTML = (W.file.mime === 'application/pdf'
+      ? '<i class="bi bi-file-earmark-pdf fs-1 text-danger"></i>'
+      : `<img src="data:${W.file.mime};base64,${W.file.base64}">`) +
+      `<div class="small mt-2 fw-semibold">${esc(f.name)}</div><small class="text-muted">Tap to change</small>`;
+    $('wNext').disabled = false;
+  } catch (e) { toast(e.message || 'Could not read this file.', 'danger'); ev.target.value = ''; }
+  finally { busy(false); }
+});
+function readB64(file) {
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(file); });
+}
+async function prepFile(f) {
+  const max = (S.data.maxFileMB || 5) * 1024 * 1024;
+  if (f.type === 'application/pdf') {
+    if (f.size > max) throw new Error('PDF is larger than ' + S.data.maxFileMB + ' MB.');
+    return { name: f.name, mime: 'application/pdf', base64: await readB64(f) };
+  }
+  if (f.type.indexOf('image/') !== 0) throw new Error('Only images or PDF files are allowed.');
+  const url = URL.createObjectURL(f);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('This image format is not supported. Use JPG or PNG.')); i.src = url; });
+    const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(img.width * scale); cv.height = Math.round(img.height * scale);
+    const ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); ctx.drawImage(img, 0, 0, cv.width, cv.height);
+    const b64 = cv.toDataURL('image/jpeg', 0.82).split(',')[1];
+    return { name: f.name.replace(/\.\w+$/, '') + '.jpg', mime: 'image/jpeg', base64: b64 };
+  } finally { URL.revokeObjectURL(url); }
+}
+$('wPrev').onclick = () => go(W.step - 1);
+$('wBack').onclick = () => (W.step > 1 && W.step < 4) ? go(W.step - 1) : view('appView');
+$('wNext').onclick = async () => {
+  if (W.step === 1) {
+    if (!$('wMonth').value) return toast('Select a month.', 'warning');
+    if (!(Number($('wAmount').value) > 0)) return toast('Enter a valid amount.', 'warning');
+    return go(2);
+  }
+  if (W.step === 2) {
+    if (!medium()) return toast('Select Bank or Cash.', 'warning');
+    if (!$('wDate').value) return toast('Select the payment date.', 'warning');
+    return go(3);
+  }
+  if (W.step === 3) {
+    if (!W.file) return toast('Payment proof is required.', 'danger');
+    busy(true);
+    try {
+      await api('submitDeposit', S.token, {
+        month: $('wMonth').value, amount: Number($('wAmount').value),
+        medium: medium(), date: $('wDate').value, file: W.file
+      });
+      $('wNav').style.display = 'none'; go(4);
+    } catch (e) { handleErr(e); } finally { busy(false); }
+  }
+};
+$('wDone').onclick = async () => { busy(true); try { S.tab = 'fund'; await load(true); } catch (e) { handleErr(e); } finally { busy(false); } };
+$('fab').onclick = openWizard;
+
+/* =================== DEPOSIT SHORTCUT & COPY ===================== */
+document.addEventListener('click', e => {
+  const dep = e.target.closest('.js-deposit');
+  if (dep) { e.preventDefault(); openWizard(); return; }
+  const cp = e.target.closest('.js-copy');
+  if (cp) { e.preventDefault(); copyText(cp.dataset.copy); }
+});
+function copyText(t) {
+  const done = () => toast('কপি হয়েছে');
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done).catch(() => fallbackCopy(t, done));
+  else fallbackCopy(t, done);
+}
+function fallbackCopy(t, cb) {
+  const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); cb(); } catch (e) { /* ignore */ }
+  document.body.removeChild(ta);
+}
+
+/* =================== POLICY IMAGE UPLOAD (admin, inside My Fund) ===== */
+$('tabContent').addEventListener('change', async e => {
+  if (e.target.id !== 'policyFile') return;
+  const f = e.target.files[0]; if (!f) return;
+  busy(true);
+  try {
+    const file = await prepFile(f);
+    if (file.mime.indexOf('image/') !== 0) throw new Error('শুধু ছবি আপলোড করা যাবে।');
+    const r = await api('setPolicyImage', S.token, file);
+    S.data.policy = r.policy;
+    toast('নীতিমালার ছবি আপডেট হয়েছে');
+    render();
+  } catch (err) { handleErr(err); } finally { busy(false); e.target.value = ''; }
+});
+
+/* =================== NOTICES =================== */
+let NOTICES = [];
+function phoneDisplay(p) { return p && p.length === 11 ? p.slice(0, 5) + '-' + p.slice(5) : (p || ''); }
+$('btnNotice').onclick = openNotices;
+$('nBack').onclick = () => view('appView');
+async function openNotices() {
+  const cs = S.data.cashier, ch = S.data.chairman;
+  $('callCashier').innerHTML = `<i class="bi bi-telephone"></i> ${esc(cs.name)}<br><small>${esc(phoneDisplay(cs.phone))}</small>`;
+  $('callCashier').href = 'tel:' + cs.phone;
+  $('callChairman').innerHTML = `<i class="bi bi-telephone"></i> ${esc(ch.name)}<br><small>${esc(phoneDisplay(ch.phone))}</small>`;
+  $('callChairman').href = 'tel:' + ch.phone;
+  $('noticeComposer').style.display = S.data.user.role === 'Admin' ? '' : 'none';
+  view('noticeView');
+  await reloadNotices();
+}
+async function reloadNotices() {
+  busy(true);
+  try { NOTICES = await api('getNotices', S.token); renderNotices(); }
+  catch (e) { handleErr(e); } finally { busy(false); }
+}
+function renderNotices() {
+  const isAdmin = S.data.user.role === 'Admin';
+  $('noticeList').innerHTML = NOTICES.length ? NOTICES.map(n => `
+    <div class="cardx mb-3" data-nid="${esc(n.id)}">
+      <div class="d-flex justify-content-between">
+        <div><div class="fw-bold">${esc(n.author)}</div><small class="text-muted">${esc(n.time)}</small></div>
+        ${isAdmin ? `<button class="btn btn-sm btn-outline-danger js-ndel" data-id="${esc(n.id)}"><i class="bi bi-trash"></i></button>` : ''}
+      </div>
+      ${n.text ? `<p class="mt-2 mb-2" style="white-space:pre-wrap">${esc(n.text)}</p>` : ''}
+      ${n.fileType === 'image' ? `<a href="${esc(n.fileUrl)}" target="_blank" rel="noopener"><img src="${esc(n.fileUrl)}" class="img-fluid rounded mb-2"></a>` : ''}
+      ${n.fileType === 'file' ? `<a href="${esc(n.fileUrl)}" target="_blank" rel="noopener" class="d-inline-block mb-2"><i class="bi bi-paperclip"></i> ফাইল দেখুন</a>` : ''}
+      <div class="border-top pt-2 mt-2">
+        ${n.comments.map(c => `<div class="small mb-2"><b>${esc(c.author)}</b> <span class="text-muted">${esc(c.time)}</span><br>${esc(c.text)}</div>`).join('') || '<div class="small text-muted mb-2">No comments yet.</div>'}
+        <div class="d-flex gap-2">
+          <input type="text" class="form-control form-control-sm js-ctext" placeholder="মন্তব্য লিখুন..." maxlength="${S.data.maxCommentLen || 500}">
+          <button class="btn btn-sm btn-brand js-csend" data-id="${esc(n.id)}"><i class="bi bi-send"></i></button>
+        </div>
+      </div>
+    </div>`).join('') : `<div class="cardx text-center text-muted py-5">এখনো কোনো নোটিশ নেই।</div>`;
+}
+let ND = { file: null };
+$('nFile').addEventListener('change', async ev => {
+  const f = ev.target.files[0]; ND.file = null; $('nFileName').textContent = '';
+  if (!f) return;
+  busy(true);
+  try { ND.file = await prepFile(f); $('nFileName').textContent = f.name; }
+  catch (e) { toast(e.message || 'ফাইল পড়া যায়নি।', 'danger'); ev.target.value = ''; }
+  finally { busy(false); }
+});
+$('nPost').onclick = async () => {
+  const text = $('nText').value.trim();
+  if (!text && !ND.file) return toast('লেখা অথবা ফাইল দিন।', 'warning');
+  busy(true);
+  try {
+    await api('postNotice', S.token, { text: text, file: ND.file });
+    $('nText').value = ''; ND.file = null; $('nFile').value = ''; $('nFileName').textContent = '';
+    toast('নোটিশ পোস্ট হয়েছে');
+    await reloadNotices();
+  } catch (e) { handleErr(e); } finally { busy(false); }
+};
+$('noticeList').addEventListener('click', e => {
+  const del = e.target.closest('.js-ndel');
+  if (del) return ask({
+    title: 'নোটিশ মুছবেন?', text: 'এটি আর ফিরিয়ে আনা যাবে না।', btn: 'মুছুন', cls: 'btn-danger',
+    onOk: async () => { await api('deleteNotice', S.token, del.dataset.id); toast('মুছে ফেলা হয়েছে'); await reloadNotices(); }
+  });
+  const send = e.target.closest('.js-csend');
+  if (send) return sendComment(send);
+});
+$('noticeList').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.classList.contains('js-ctext')) {
+    e.preventDefault();
+    const btn = e.target.closest('[data-nid]').querySelector('.js-csend');
+    if (btn) sendComment(btn);
+  }
+});
+async function sendComment(btn) {
+  const card = btn.closest('[data-nid]');
+  const input = card.querySelector('.js-ctext');
+  const text = input.value.trim();
+  if (!text) return;
+  busy(true);
+  try { await api('addComment', S.token, btn.dataset.id, text); input.value = ''; await reloadNotices(); }
+  catch (err) { handleErr(err); } finally { busy(false); }
+}
+
+/* =================== BOOT =================== */
+(async function init() {
+  if (!S.token) return view('loginView');
+  busy(true);
+  try { await load(); } catch (e) { view('loginView'); } finally { busy(false); }
+})();
+</script>
+</body>
+</html>
