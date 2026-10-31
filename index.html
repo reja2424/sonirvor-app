@@ -23,12 +23,12 @@
   .btn-brand:disabled{background:#94a3b8;color:#fff}
   .form-control,.form-select{border-radius:14px;padding:13px 14px;font-size:1rem}
   .content{padding:16px 16px 150px}
-  .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:#fff;display:flex;border-top:1px solid #e5e9f0;padding-bottom:env(safe-area-inset-bottom)}
+  .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:#fff;display:flex;border-top:1px solid #e5e9f0;padding-bottom:env(safe-area-inset-bottom);z-index:50}
   .bottom-nav button{flex:1;border:0;background:none;padding:10px 2px 8px;color:var(--mute);font-size:.66rem;position:relative}
   .bottom-nav button i{display:block;font-size:1.25rem}
   .bottom-nav button.on{color:var(--brand);font-weight:600}
   .bdg{position:absolute;top:4px;left:55%;background:#ef4444;color:#fff;border-radius:10px;font-size:.62rem;padding:1px 6px}
-  .fab{position:fixed;bottom:calc(74px + env(safe-area-inset-bottom));right:max(16px,calc(50% - 244px));z-index:60;border:0;border-radius:30px;padding:14px 20px;background:var(--brand);color:#fff;font-weight:600;box-shadow:0 10px 20px rgba(20,184,166,.25)}
+  .fab{position:fixed;bottom:calc(74px + env(safe-area-inset-bottom));right:max(16px,calc(50% - 244px));z-index:60;border:0;border-radius:30px;padding:14px 20px;background:var(--brand);color:#fff;font-weight:600;box-shadow:0 8px 20px rgba(15,118,110,.4)}
   .tx{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #eef1f5;gap:10px}
   .tx:last-child{border:0}
   .pill{font-size:.68rem;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
@@ -214,7 +214,7 @@
   </section>
 </div>
 
-<!-- Pick-your-name modal (shared default User ID) -->
+<!-- Pick-your-name modal -->
 <div class="modal fade" id="pickModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content" style="border-radius:18px">
@@ -234,7 +234,7 @@
     <div class="modal-content">
       <div class="modal-header"><h6 class="modal-title">Payment proof</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body text-center" id="proofBody"></div>
-      <div class="modal-footer"><a id="proofLink" class="btn btn-outline-secondary btn-sm" target="_blank" rel="noopener">Open in Drive</a><button class="btn btn-brand btn-sm px-4" data-bs-dismiss="modal">Close</button></div>
+      <div class="modal-footer"><a id="proofLink" class="btn btn-outline-secondary btn-sm" target="_blank" rel="noopener">Open in Drive</a><button class="btn btn-brand btn-sm px-4" data-bs-dismiss="modal">Done</button></div>
     </div>
   </div>
 </div>
@@ -317,18 +317,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-/* =================== STATE & HELPERS =================== */
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const S = { token: null, data: null, tab: null, viewed: {}, wiz: { step: 1, file: null } };
-try { S.token = localStorage.getItem('fm_token'); } catch (e) {}
-const $ = id => document.getElementById(id);
-const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money = n => (S.data ? S.data.currency : '') + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
-const moneyD = n => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + (S.data ? S.data.currency : '৳');
-const modal = id => bootstrap.Modal.getOrCreateInstance($(id));
-
-/* =================== API CONNECTION FOR VERCEL =================== */
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzS4ybFMKL4FvVUVcesWHh7f5y4mnKRu86f4KcuCCXfLYd7H-5BgAWA6QifYwW4fUR2/exec";
+/* =================== API CONNECTION FOR VERCEL/RENDER =================== */
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx6qc8ZnIaZcaOPKvO4iJqLUSsoszfoSvhjT3Ag0Wc/dev";
 
 async function api(fn, ...args) {
   const response = await fetch(GAS_API_URL, {
@@ -341,6 +331,35 @@ async function api(fn, ...args) {
     throw new Error(json.error);
   }
   return json.result;
+}
+
+/* =================== STATE & HELPERS =================== */
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const S = { token: null, data: null, tab: null, viewed: {}, wiz: { step: 1, file: null } };
+try { S.token = localStorage.getItem('fm_token'); } catch (e) {}
+const $ = id => document.getElementById(id);
+const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => (S.data ? S.data.currency : '') + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+const moneyD = n => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + (S.data ? S.data.currency : '৳');
+const modal = id => bootstrap.Modal.getOrCreateInstance($(id));
+
+function busy(on) { $('busy').classList.toggle('on', !!on); }
+function toast(msg, type) {
+  const d = document.createElement('div');
+  d.className = 'alert alert-' + (type || 'success') + ' shadow py-2 mb-2';
+  d.textContent = msg;
+  $('toasts').appendChild(d);
+  setTimeout(() => d.remove(), 3500);
+}
+function view(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function handleErr(e) {
+  const m = (e && e.message) ? e.message.replace(/^Error:\s*/, '') : String(e);
+  if (m.indexOf('SESSION_EXPIRED') >= 0) { doLogout(true); return; }
+  toast(m, 'danger');
 }
 
 /* =================== AUTH =================== */
@@ -430,7 +449,7 @@ function vDash(d) {
   const tile = (go, label, val, icon) => `<div class="col-6"><div class="cardx dash-card ${go ? '' : 'static'}" ${go ? `data-go="${go}" role="button"` : ''}>
       <i class="bi bi-${icon}"></i><small>${label}</small><b>${moneyD(val)}</b></div></div>`;
   let h = '';
-  if (d.usingDefaultPin) h += `<div class="alert alert-warning py-2 small mb-3">আপনি ডিফল্ট PIN ব্যবহার করছেন। <a href="#" class="alert-link js-tab" data-tab="account">এখানে পরিবর্তন করুন</a></div>`;
+  if (d.usingDefaultPin) h += `<div class="alert alert-warning py-2 small mb-3">আপনি ডিফল্ট PIN ব্যবহার করছেন। <a href="#" class="alert-link js-tab" data-tab="account">Account</a> থেকে নিজের PIN দিন।</div>`;
   h += `<div class="cardx dash-big mb-2" data-go="deposits" role="button">
       <small>মোট সংগৃহীত ফান্ড</small><div class="fs-3 fw-bold">${moneyD(g.collected)}</div>
       ${g.pending ? `<small>অপেক্ষমাণ যাচাই: ${moneyD(g.pending)}</small>` : ''}</div>`;
@@ -504,7 +523,7 @@ function vFund(d) {
       <div class="col-4"><div class="cardx stat"><small>Entries</small><b>${o.count}</b></div></div></div>
     <div class="cardx mb-3">
       <div class="d-flex justify-content-between align-items-start gap-2">
-        <div><h6 class="mb-1">টাকা জমা দিন</h6><small class="text-muted">নিচের হিসাবে পাঠিয়ে "নতুন জমা" থেকে প্রমাণ আপলোড করুন</small></div>
+        <div><h6 class="mb-1">টাকা জমা দিন</h6><small class="text-muted">নিচের হিসাবে পাঠিয়ে "নতুন জমা" থেকে প্রমাণ জমা দিন</small></div>
         <button class="btn btn-brand btn-sm text-nowrap js-deposit">+ নতুন জমা</button>
       </div>
       <div class="mt-3 small">
@@ -513,8 +532,7 @@ function vFund(d) {
         <div class="d-flex justify-content-between py-1"><span class="text-muted">হিসাবের নাম</span><span class="fw-semibold text-end">${esc(bank.accountName)}</span></div>
         <div class="d-flex justify-content-between py-1 align-items-center"><span class="text-muted">হিসাব নম্বর</span>
           <span class="fw-semibold text-end">${esc(bank.accountNo)} <a href="#" class="js-copy ms-1" data-copy="${esc(bank.accountNo)}" title="কপি করুন"><i class="bi bi-copy"></i></a></span></div>
-      </div>
-    </div>
+      </div></div>
     <div class="cardx mb-3"><h6>All transactions</h6><div class="table-responsive"><table class="table tbl align-middle">
       <thead><tr><th>Date</th><th>Month</th><th>Amount</th><th>Medium</th><th>Status</th><th>Proof</th></tr></thead>
       <tbody>${rows || '<tr><td colspan="6" class="text-center text-muted py-4">Nothing yet</td></tr>'}</tbody></table></div></div>
@@ -557,436 +575,4 @@ function vMembers(d) {
         <div><div class="fw-bold">${esc(m.name)}${self ? ' <small class="text-muted">(you)</small>' : ''}</div><small class="text-muted">${esc(m.email || 'no email yet')}</small></div>
         <div class="text-end">${pill(m.role)} ${pill(m.status)}${m.defaultLogin ? ' <span class="pill p-Pending">Default login</span>' : ''}</div>
       </div>
-      <div class="small mt-2 text-muted">Approved <b class="text-dark">${money(m.approved)}</b> · Pending <b class="text-dark">${money(m.pending)}</b> · ${m.count} entries${m.hasSheet ? '' : ' · <span class="text-danger">no sheet</span>'}</div>
-      <div class="d-flex gap-2 mt-2">
-        <button class="btn btn-sm btn-outline-secondary flex-fill js-ledger" data-sheet="${esc(m.sheet)}" ${m.hasSheet ? '' : 'disabled'}><i class="bi bi-journal-text"></i> Ledger</button>
-        <button class="btn btn-sm btn-outline-secondary flex-fill js-uedit" data-key="${esc(m.key)}"><i class="bi bi-pencil"></i> Edit</button>
-        ${m.status === 'Active'
-          ? `<button class="btn btn-sm btn-outline-danger js-ustatus" data-key="${esc(m.key)}" data-status="Removed" ${self ? 'disabled' : ''}><i class="bi bi-person-dash"></i></button>`
-          : `<button class="btn btn-sm btn-outline-success js-ustatus" data-key="${esc(m.key)}" data-status="Active"><i class="bi bi-person-check"></i> Restore</button>`}
-      </div></div>`;
-  }).join('');
-  return `<button class="btn btn-brand w-100 mb-3 js-uadd"><i class="bi bi-person-plus"></i> Add member / admin</button>${cards}`;
-}
-function vAccount(d) {
-  const u = d.user;
-  return `<div class="cardx mb-3"><div class="fw-bold">${esc(u.name)}</div><small class="text-muted d-block mb-1">${esc(u.email || 'No email yet — ask the admin')}</small>${pill(u.role)}</div>
-    <div class="cardx"><h6>Change PIN</h6>
-      <input id="pOld" type="password" inputmode="numeric" class="form-control mb-2" placeholder="Current PIN" autocomplete="current-password">
-      <input id="pNew" type="password" inputmode="numeric" class="form-control mb-2" placeholder="New PIN (4–8 digits)" autocomplete="new-password">
-      <input id="pNew2" type="password" inputmode="numeric" class="form-control mb-3" placeholder="Repeat new PIN" autocomplete="new-password">
-      <button class="btn btn-brand w-100 js-chgpin">Update PIN</button></div>`;
-}
-
-/* =================== PROOF + ACTIONS =================== */
-let blobUrl = null;
-async function showProof(sheet, id, isAdmin) {
-  $('proofBody').innerHTML = '<div class="spinner-border text-success my-5"></div>';
-  $('proofLink').style.display = 'none';
-  modal('proofModal').show();
-  try {
-    const p = await api('getProof', S.token, sheet, id);
-    if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
-    if (p.base64 && p.mime.indexOf('image/') === 0) {
-      $('proofBody').innerHTML = `<img class="img-fluid rounded" src="data:${esc(p.mime)};base64,${p.base64}">`;
-    } else if (p.base64 && p.mime === 'application/pdf') {
-      const bin = atob(p.base64), arr = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-      blobUrl = URL.createObjectURL(new Blob([arr], { type: 'application/pdf' }));
-      $('proofBody').innerHTML = `<iframe src="${blobUrl}" style="width:100%;height:70vh;border:0"></iframe>`;
-    } else {
-      $('proofBody').innerHTML = '<p class="text-muted my-4">Preview not available. Use “Open in Drive”.</p>';
-    }
-    $('proofLink').href = p.url; $('proofLink').style.display = '';
-    if (isAdmin) {
-      S.viewed[id] = true;
-      const b = document.querySelector(`[data-approve="${CSS.escape(id)}"]`);
-      if (b) { b.disabled = false; const t = b.closest('[data-card]').querySelector('small:last-child'); if (t) t.textContent = 'Proof verified — you can approve.'; }
-    }
-  } catch (e) { modal('proofModal').hide(); handleErr(e); }
-}
-
-function ask({ title, text, note, btn, cls, onOk }) {
-  $('actTitle').textContent = title; $('actText').textContent = text;
-  $('actNote').style.display = note ? '' : 'none'; $('actNote').value = '';
-  $('actOk').textContent = btn; $('actOk').className = 'btn flex-fill ' + cls;
-  $('actOk').onclick = async () => { modal('actModal').hide(); busy(true); try { await onOk($('actNote').value); } catch (e) { handleErr(e); } finally { busy(false); } };
-  modal('actModal').show();
-}
-const ownSheet = () => S.data.user.sheet;
-const findMember = key => S.data.admin.members.find(m => m.key === key);
-
-$('tabContent').addEventListener('click', async e => {
-  const tabLink = e.target.closest('.js-tab');
-  if (tabLink) { e.preventDefault(); S.tab = tabLink.dataset.tab; render(); window.scrollTo(0, 0); return; }
-  const goEl = e.target.closest('[data-go]');
-  if (goEl) return openDetail(goEl.dataset.go);
-  const own = e.target.closest('.js-own-proof');
-  if (own) { e.preventDefault(); showProof(ownSheet(), own.dataset.id, false); return; }
-  const b = e.target.closest('button'); if (!b) return;
-  const { sheet, id, key } = b.dataset;
-  const cl = b.classList;
-
-  if (cl.contains('js-view')) return showProof(sheet, id, true);
-  if (cl.contains('js-approve') && !b.disabled) return ask({
-    title: 'Approve this entry?', text: 'Confirm that the payment proof matches the amount and date.', btn: 'Approve', cls: 'btn-success',
-    onOk: async () => { await api('approveEntry', S.token, sheet, id); toast('Entry approved'); await load(true); }
-  });
-  if (cl.contains('js-reject')) return ask({
-    title: 'Reject this entry?', text: 'The member will see it as Rejected.', note: true, btn: 'Reject', cls: 'btn-danger',
-    onOk: async note => { await api('rejectEntry', S.token, sheet, id, note); toast('Entry rejected', 'warning'); await load(true); }
-  });
-
-  if (cl.contains('js-uadd')) return openUser(null);
-  if (cl.contains('js-uedit')) return openUser(findMember(key));
-  if (cl.contains('js-ledger')) return openLedger(sheet);
-  if (cl.contains('js-ustatus')) {
-    const m = findMember(key), status = b.dataset.status;
-    return ask({
-      title: status === 'Removed' ? 'Remove ' + m.name + '?' : 'Restore ' + m.name + '?',
-      text: status === 'Removed' ? 'They will no longer be able to sign in. Their sheet and past records are kept.' : 'They will be able to sign in again.',
-      btn: status === 'Removed' ? 'Remove' : 'Restore', cls: status === 'Removed' ? 'btn-danger' : 'btn-success',
-      onOk: async () => { await api('setUserStatus', S.token, key, status); toast(status === 'Removed' ? 'User removed' : 'User restored'); await load(true, true); }
-    });
-  }
-  if (cl.contains('js-chgpin')) {
-    const o = $('pOld').value, n = $('pNew').value, n2 = $('pNew2').value;
-    if (!/^\d{4,8}$/.test(n)) return toast('New PIN must be 4–8 digits.', 'warning');
-    if (n !== n2) return toast('The new PINs do not match.', 'warning');
-    busy(true);
-    try { await api('changePin', S.token, o, n); toast('PIN updated'); ['pOld', 'pNew', 'pNew2'].forEach(i => $(i).value = ''); await load(true, true); }
-    catch (err) { handleErr(err); } finally { busy(false); }
-  }
-});
-
-/* =================== ADMIN: USER MODAL =================== */
-let uEditKey = null;
-function openUser(m) {
-  uEditKey = m ? m.key : null;
-  $('uTitle').textContent = m ? 'Edit user' : 'Add member / admin';
-  $('uName').value = m ? m.name : '';
-  $('uEmail').value = m ? m.email : '';
-  $('uPin').value = '';
-  $('uPin').placeholder = m ? 'Leave blank to keep current PIN' : 'PIN (4–8 digits)';
-  $('uPinHint').textContent = m && m.defaultLogin ? 'এই সদস্য ডিফল্ট লগইনে আছেন। নতুন PIN সেট করলে ডিফল্ট User ID বদলে যাবে।' : 'দুই-তিন ডিজিটের PIN নয়; 4–8 ডিজিট দিন।';
-  $('uRole').value = m ? m.role : 'Member';
-  $('uSheet').value = m && m.sheet !== m.name ? m.sheet : '';
-  $('uCreate').checked = !m;
-  modal('userModal').show();
-}
-$('uRole').onchange = () => { if (!uEditKey) $('uCreate').checked = $('uRole').value === 'Member'; };
-$('uSave').onclick = async () => {
-  const p = {
-    key: uEditKey, name: $('uName').value, email: $('uEmail').value, pin: $('uPin').value,
-    role: $('uRole').value, sheet: $('uSheet').value, createSheet: $('uCreate').checked
-  };
-  busy(true);
-  try {
-    await api('saveUser', S.token, p);
-    modal('userModal').hide();
-    toast(uEditKey ? 'User updated' : 'User added');
-    await load(true, true);
-  } catch (e) { handleErr(e); } finally { busy(false); }
-};
-
-/* =================== ADMIN: LEDGER & ENTRY EDIT =================== */
-let L = { sheet: '', member: '', entries: [] };
-let editing = null;
-async function fetchLedger(sheet) {
-  const r = await api('getLedger', S.token, sheet);
-  L = { sheet: r.sheet, member: r.member, entries: r.entries };
-  renderLedger();
-}
-async function openLedger(sheet) {
-  busy(true);
-  try { await fetchLedger(sheet); view('ledgerView'); } catch (e) { handleErr(e); } finally { busy(false); }
-}
-function renderLedger() {
-  $('lTitle').textContent = L.member;
-  $('lSub').textContent = L.entries.length + ' entries · tap ✎ to edit';
-  const rows = L.entries.map(e => `<tr>
-      <td>${esc(e.month)}</td><td class="fw-semibold">${money(e.amount)}</td><td>${esc(e.medium)}</td><td>${esc(e.date)}</td><td>${pill(e.status)}</td>
-      <td class="text-nowrap">${e.proofUrl && !e.legacy ? `<a href="#" class="me-2 js-lproof" data-id="${esc(e.id)}"><i class="bi bi-paperclip"></i></a>` : ''}
-        <button class="btn btn-sm btn-outline-secondary js-eedit" data-id="${esc(e.id)}"><i class="bi bi-pencil"></i></button></td></tr>`).join('');
-  $('lBody').innerHTML = `<div class="table-responsive"><table class="table tbl align-middle mb-0">
-    <thead><tr><th>Month</th><th>Amount</th><th>Medium</th><th>Date</th><th>Status</th><th></th></tr></thead>
-    <tbody>${rows || '<tr><td colspan="6" class="text-center text-muted py-4">No entries</td></tr>'}</tbody></table></div>`;
-}
-$('lBack').onclick = () => view('appView');
-$('lBody').addEventListener('click', e => {
-  const a = e.target.closest('.js-lproof');
-  if (a) { e.preventDefault(); return showProof(L.sheet, a.dataset.id, false); }
-  const b = e.target.closest('.js-eedit');
-  if (b) openEdit(b.dataset.id);
-});
-function openEdit(id) {
-  const e = L.entries.find(x => x.id === id); if (!e) return;
-  editing = e;
-  $('eInfo').textContent = L.member + ' · ' + e.status + (e.legacy ? ' · old record' : '');
-  const mo = $('eMonth'); mo.innerHTML = '';
-  const ms = MONTHS.slice(); if (e.month && ms.indexOf(e.month) < 0) ms.unshift(e.month);
-  ms.forEach(m => mo.add(new Option(m, m)));
-  mo.value = e.month;
-  $('eAmount').value = e.amount;
-  const sel = $('eMedium'); sel.innerHTML = '';
-  const opts = ['Bank', 'Cash'];
-  if (opts.indexOf(e.medium) < 0) opts.unshift(e.medium);
-  opts.forEach(m => sel.add(new Option(m || '—', m)));
-  sel.value = e.medium;
-  $('eDate').value = e.dateISO || '';
-  $('eDateHint').textContent = e.dateISO ? '' : 'Current: ' + e.date + ' (leave blank to keep)';
-  modal('editModal').show();
-}
-$('eSave').onclick = async () => {
-  if (!editing) return;
-  busy(true);
-  try {
-    const r = await api('editEntry', S.token, L.sheet, editing.id,
-      { month: editing.month, amount: editing.amount, date: editing.date },
-      { month: $('eMonth').value, amount: Number($('eAmount').value), medium: $('eMedium').value, date: $('eDate').value });
-    modal('editModal').hide();
-    toast(r.changed ? 'Entry updated' : 'No changes', r.changed ? 'success' : 'info');
-    await fetchLedger(L.sheet);
-    await load(true, true);
-  } catch (e) { handleErr(e); } finally { busy(false); }
-};
-
-/* =================== WIZARD =================== */
-const W = S.wiz;
-function monthHint() {
-  const m = $('wMonth').value;
-  const hit = (S.data.own ? S.data.own.entries : []).filter(e => e.month === m && e.status !== 'Rejected');
-  $('wMonthHint').textContent = hit.length
-    ? '⚠ ' + m + ' মাসের জমা আগেই আছে (' + hit.map(x => x.status).join(', ') + '). ভিন্ন পেমেন্ট হলে চালিয়ে যান।'
-    : '';
-}
-function openWizard() {
-  W.step = 1; W.file = null;
-  const mSel = $('wMonth'); mSel.innerHTML = '';
-  const cur = new Date().getMonth();
-  MONTHS.forEach((m, i) => { const o = new Option(m, m); if (i === cur) o.selected = true; mSel.add(o); });
-  monthHint();
-  $('wAmount').value = '';
-  document.querySelectorAll('.opt').forEach(o => { o.classList.remove('sel'); o.querySelector('input').checked = false; });
-  const t = new Date(); $('wDate').value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-  $('wFile').value = ''; resetDrop(); $('wNav').style.display = '';
-  go(1); view('wizView');
-}
-$('wMonth').addEventListener('change', monthHint);
-function go(n) {
-  W.step = n;
-  document.querySelectorAll('.step').forEach(s => s.classList.toggle('on', Number(s.dataset.s) === n));
-  document.querySelectorAll('#wSteps span').forEach((s, i) => s.classList.toggle('on', i < Math.min(n, 3)));
-  $('wPrev').style.visibility = n === 1 ? 'hidden' : 'visible';
-  $('wNext').textContent = n === 3 ? 'Submit deposit' : 'Next';
-  $('wNext').disabled = n === 3 && !W.file;
-  if (n === 3) summary();
-}
-function summary() {
-  $('wSummary').innerHTML = `<div class="d-flex justify-content-between"><span class="text-muted">Month</span><b>${esc($('wMonth').value)}</b></div>
-    <div class="d-flex justify-content-between"><span class="text-muted">Amount</span><b>${money($('wAmount').value)}</b></div>
-    <div class="d-flex justify-content-between"><span class="text-muted">Medium</span><b>${esc(medium())}</b></div>
-    <div class="d-flex justify-content-between"><span class="text-muted">Date</span><b>${esc($('wDate').value)}</b></div>`;
-}
-const medium = () => { const r = document.querySelector('input[name=med]:checked'); return r ? r.value : ''; };
-document.querySelectorAll('.opt').forEach(o => o.addEventListener('click', () => {
-  document.querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
-  o.classList.add('sel'); o.querySelector('input').checked = true;
-}));
-function resetDrop() {
-  $('wDrop').classList.remove('has');
-  $('wDropIn').innerHTML = '<i class="bi bi-cloud-arrow-up fs-1 text-secondary"></i><div class="fw-semibold">Tap to choose a file</div><small class="text-muted">JPG · PNG · PDF</small>';
-}
-$('wFile').addEventListener('change', async ev => {
-  const f = ev.target.files[0]; W.file = null; resetDrop(); $('wNext').disabled = true;
-  if (!f) return;
-  busy(true);
-  try {
-    W.file = await prepFile(f);
-    $('wDrop').classList.add('has');
-    $('wDropIn').innerHTML = (W.file.mime === 'application/pdf'
-      ? '<i class="bi bi-file-earmark-pdf fs-1 text-danger"></i>'
-      : `<img src="data:${W.file.mime};base64,${W.file.base64}">`) +
-      `<div class="small mt-2 fw-semibold">${esc(f.name)}</div><small class="text-muted">Tap to change</small>`;
-    $('wNext').disabled = false;
-  } catch (e) { toast(e.message || 'Could not read this file.', 'danger'); ev.target.value = ''; }
-  finally { busy(false); }
-});
-function readB64(file) {
-  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(file); });
-}
-async function prepFile(f) {
-  const max = (S.data.maxFileMB || 5) * 1024 * 1024;
-  if (f.type === 'application/pdf') {
-    if (f.size > max) throw new Error('PDF is larger than ' + S.data.maxFileMB + ' MB.');
-    return { name: f.name, mime: 'application/pdf', base64: await readB64(f) };
-  }
-  if (f.type.indexOf('image/') !== 0) throw new Error('Only images or PDF files are allowed.');
-  const url = URL.createObjectURL(f);
-  try {
-    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('This image format is not supported. Use JPG or PNG.')); i.src = url; });
-    const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
-    const cv = document.createElement('canvas');
-    cv.width = Math.round(img.width * scale); cv.height = Math.round(img.height * scale);
-    const ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); ctx.drawImage(img, 0, 0, cv.width, cv.height);
-    const b64 = cv.toDataURL('image/jpeg', 0.82).split(',')[1];
-    return { name: f.name.replace(/\.\w+$/, '') + '.jpg', mime: 'image/jpeg', base64: b64 };
-  } finally { URL.revokeObjectURL(url); }
-}
-$('wPrev').onclick = () => go(W.step - 1);
-$('wBack').onclick = () => (W.step > 1 && W.step < 4) ? go(W.step - 1) : view('appView');
-$('wNext').onclick = async () => {
-  if (W.step === 1) {
-    if (!$('wMonth').value) return toast('Select a month.', 'warning');
-    if (!(Number($('wAmount').value) > 0)) return toast('Enter a valid amount.', 'warning');
-    return go(2);
-  }
-  if (W.step === 2) {
-    if (!medium()) return toast('Select Bank or Cash.', 'warning');
-    if (!$('wDate').value) return toast('Select the payment date.', 'warning');
-    return go(3);
-  }
-  if (W.step === 3) {
-    if (!W.file) return toast('Payment proof is required.', 'danger');
-    busy(true);
-    try {
-      await api('submitDeposit', S.token, {
-        month: $('wMonth').value, amount: Number($('wAmount').value),
-        medium: medium(), date: $('wDate').value, file: W.file
-      });
-      $('wNav').style.display = 'none'; go(4);
-    } catch (e) { handleErr(e); } finally { busy(false); }
-  }
-};
-$('wDone').onclick = async () => { busy(true); try { S.tab = 'fund'; await load(true); } catch (e) { handleErr(e); } finally { busy(false); } };
-$('fab').onclick = openWizard;
-
-/* =================== DEPOSIT SHORTCUT & COPY ===================== */
-document.addEventListener('click', e => {
-  const dep = e.target.closest('.js-deposit');
-  if (dep) { e.preventDefault(); openWizard(); return; }
-  const cp = e.target.closest('.js-copy');
-  if (cp) { e.preventDefault(); copyText(cp.dataset.copy); }
-});
-function copyText(t) {
-  const done = () => toast('কপি হয়েছে');
-  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done).catch(() => fallbackCopy(t, done));
-  else fallbackCopy(t, done);
-}
-function fallbackCopy(t, cb) {
-  const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
-  document.body.appendChild(ta); ta.focus(); ta.select();
-  try { document.execCommand('copy'); cb(); } catch (e) { /* ignore */ }
-  document.body.removeChild(ta);
-}
-
-/* =================== POLICY IMAGE UPLOAD (admin, inside My Fund) ===== */
-$('tabContent').addEventListener('change', async e => {
-  if (e.target.id !== 'policyFile') return;
-  const f = e.target.files[0]; if (!f) return;
-  busy(true);
-  try {
-    const file = await prepFile(f);
-    if (file.mime.indexOf('image/') !== 0) throw new Error('শুধু ছবি আপলোড করা যাবে।');
-    const r = await api('setPolicyImage', S.token, file);
-    S.data.policy = r.policy;
-    toast('নীতিমালার ছবি আপডেট হয়েছে');
-    render();
-  } catch (err) { handleErr(err); } finally { busy(false); e.target.value = ''; }
-});
-
-/* =================== NOTICES =================== */
-let NOTICES = [];
-function phoneDisplay(p) { return p && p.length === 11 ? p.slice(0, 5) + '-' + p.slice(5) : (p || ''); }
-$('btnNotice').onclick = openNotices;
-$('nBack').onclick = () => view('appView');
-async function openNotices() {
-  const cs = S.data.cashier, ch = S.data.chairman;
-  $('callCashier').innerHTML = `<i class="bi bi-telephone"></i> ${esc(cs.name)}<br><small>${esc(phoneDisplay(cs.phone))}</small>`;
-  $('callCashier').href = 'tel:' + cs.phone;
-  $('callChairman').innerHTML = `<i class="bi bi-telephone"></i> ${esc(ch.name)}<br><small>${esc(phoneDisplay(ch.phone))}</small>`;
-  $('callChairman').href = 'tel:' + ch.phone;
-  $('noticeComposer').style.display = S.data.user.role === 'Admin' ? '' : 'none';
-  view('noticeView');
-  await reloadNotices();
-}
-async function reloadNotices() {
-  busy(true);
-  try { NOTICES = await api('getNotices', S.token); renderNotices(); }
-  catch (e) { handleErr(e); } finally { busy(false); }
-}
-function renderNotices() {
-  const isAdmin = S.data.user.role === 'Admin';
-  $('noticeList').innerHTML = NOTICES.length ? NOTICES.map(n => `
-    <div class="cardx mb-3" data-nid="${esc(n.id)}">
-      <div class="d-flex justify-content-between">
-        <div><div class="fw-bold">${esc(n.author)}</div><small class="text-muted">${esc(n.time)}</small></div>
-        ${isAdmin ? `<button class="btn btn-sm btn-outline-danger js-ndel" data-id="${esc(n.id)}"><i class="bi bi-trash"></i></button>` : ''}
-      </div>
-      ${n.text ? `<p class="mt-2 mb-2" style="white-space:pre-wrap">${esc(n.text)}</p>` : ''}
-      ${n.fileType === 'image' ? `<a href="${esc(n.fileUrl)}" target="_blank" rel="noopener"><img src="${esc(n.fileUrl)}" class="img-fluid rounded mb-2"></a>` : ''}
-      ${n.fileType === 'file' ? `<a href="${esc(n.fileUrl)}" target="_blank" rel="noopener" class="d-inline-block mb-2"><i class="bi bi-paperclip"></i> ফাইল দেখুন</a>` : ''}
-      <div class="border-top pt-2 mt-2">
-        ${n.comments.map(c => `<div class="small mb-2"><b>${esc(c.author)}</b> <span class="text-muted">${esc(c.time)}</span><br>${esc(c.text)}</div>`).join('') || '<div class="small text-muted mb-2">No comments yet.</div>'}
-        <div class="d-flex gap-2">
-          <input type="text" class="form-control form-control-sm js-ctext" placeholder="মন্তব্য লিখুন..." maxlength="${S.data.maxCommentLen || 500}">
-          <button class="btn btn-sm btn-brand js-csend" data-id="${esc(n.id)}"><i class="bi bi-send"></i></button>
-        </div>
-      </div>
-    </div>`).join('') : `<div class="cardx text-center text-muted py-5">এখনো কোনো নোটিশ নেই।</div>`;
-}
-let ND = { file: null };
-$('nFile').addEventListener('change', async ev => {
-  const f = ev.target.files[0]; ND.file = null; $('nFileName').textContent = '';
-  if (!f) return;
-  busy(true);
-  try { ND.file = await prepFile(f); $('nFileName').textContent = f.name; }
-  catch (e) { toast(e.message || 'ফাইল পড়া যায়নি।', 'danger'); ev.target.value = ''; }
-  finally { busy(false); }
-});
-$('nPost').onclick = async () => {
-  const text = $('nText').value.trim();
-  if (!text && !ND.file) return toast('লেখা অথবা ফাইল দিন।', 'warning');
-  busy(true);
-  try {
-    await api('postNotice', S.token, { text: text, file: ND.file });
-    $('nText').value = ''; ND.file = null; $('nFile').value = ''; $('nFileName').textContent = '';
-    toast('নোটিশ পোস্ট হয়েছে');
-    await reloadNotices();
-  } catch (e) { handleErr(e); } finally { busy(false); }
-};
-$('noticeList').addEventListener('click', e => {
-  const del = e.target.closest('.js-ndel');
-  if (del) return ask({
-    title: 'নোটিশ মুছবেন?', text: 'এটি আর ফিরিয়ে আনা যাবে না।', btn: 'মুছুন', cls: 'btn-danger',
-    onOk: async () => { await api('deleteNotice', S.token, del.dataset.id); toast('মুছে ফেলা হয়েছে'); await reloadNotices(); }
-  });
-  const send = e.target.closest('.js-csend');
-  if (send) return sendComment(send);
-});
-$('noticeList').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.target.classList.contains('js-ctext')) {
-    e.preventDefault();
-    const btn = e.target.closest('[data-nid]').querySelector('.js-csend');
-    if (btn) sendComment(btn);
-  }
-});
-async function sendComment(btn) {
-  const card = btn.closest('[data-nid]');
-  const input = card.querySelector('.js-ctext');
-  const text = input.value.trim();
-  if (!text) return;
-  busy(true);
-  try { await api('addComment', S.token, btn.dataset.id, text); input.value = ''; await reloadNotices(); }
-  catch (err) { handleErr(err); } finally { busy(false); }
-}
-
-/* =================== BOOT =================== */
-(async function init() {
-  if (!S.token) return view('loginView');
-  busy(true);
-  try { await load(); } catch (e) { view('loginView'); } finally { busy(false); }
-})();
-</script>
-</body>
-</html>
+      <div class="small mt-2 text-muted">Approved <b class="text-dark">${money(m.approved)}</b> · Pending <b class="text-dark">${money(m.pending)}</b> · ${m.count} entr
